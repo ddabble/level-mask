@@ -42,8 +42,7 @@ Shader "Custom/Sky"
         _WorleyVolumeEroder ("Worley Eroder Volume", 3D) = "" {}
 
         // LIGHT
-        _PlayerPosition ("Sun Color", Color) = (1, 1, 1, 1)
-        _SunDirection ("Sun Direction", Vector) = (.4, -.7, .5)
+        _PlayerPosition ("Player Position", Vector) = (0, 0, 0)
 
     }
 
@@ -99,6 +98,7 @@ Shader "Custom/Sky"
             float4 _WindSpeed;
 
             float _Creepiness;
+            float3 _PlayerPosition;
 
             TEXTURE3D(_PerlinVolume);
             SAMPLER(sampler_PerlinVolume);
@@ -253,7 +253,7 @@ Shader "Custom/Sky"
                 Light sun = GetMainLight();
 
                 // Phase stuff
-                float3 ld = normalize(ray_origin - sun.direction);
+                float3 ld = sun.direction;
                 float dotlight = dot(ray_dir, ld);
                 float ray_phase = phase(dotlight, .4, .1);
 
@@ -333,7 +333,7 @@ Shader "Custom/Sky"
             {
                 Light sun = GetMainLight();
                 // TODO correct dir???
-                float3 sun_direction = normalize(pos - sun.direction);
+                float3 sun_direction = sun.direction;
                 float dotsun = dot(sun_direction, eyedir);
                 if (eyedir.y < 0.01)
                     return render_background(eyedir) + render_sun(dotsun) + render_creepy_stuff(dotsun);
@@ -376,7 +376,7 @@ Shader "Custom/Sky"
             {
                 float3 dir = normalize(i.viewDir);
                 // TODO må sende inn spillerposisjonen
-                float3 pos = float3(0, 0, 0);
+                float3 pos = _PlayerPosition;
                 // return float4(i.uv, 0, 1);
                 // return float4(i.viewDir, 1);
 
