@@ -2,8 +2,11 @@ using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement Player;
+
     private InputAction moveAction;
     private InputAction jumpAction;
 
@@ -12,6 +15,13 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField]
     private CinemachineCamera cinemachineCamera;
+
+    [SerializeField]
+    private GameObject head;
+
+    public GameObject Head => head;
+
+    [Header("Movement variables")]
     [SerializeField]
     private float maxSpeed = 6.0f;
     [SerializeField]
@@ -19,16 +29,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float deceleration = 7.0f;
 
- 
     private float speed = 0.0f;
     private Vector3 moveDirAlongFloor;
     private Transform cameraTransform;
- 
 
     [Tooltip("Height at peak of jump")]
     [SerializeField]
     private float jumpHeight = 2.0f;
- 
 
     [Tooltip("Time until peak")]
     [SerializeField]
@@ -50,7 +57,26 @@ public class PlayerMovement : MonoBehaviour
     private float timeSinceLastOnFloor;
     public delegate void MoveEvent();
     public MoveEvent OnJump;
-  
+
+    private void Awake()
+    {
+        #region Singleton boilerplate
+
+        if (Player != null)
+        {
+            if (Player != this)
+            {
+                Debug.LogWarning($"There's more than one {Player.GetType()} in the scene!", this);
+                Destroy(gameObject);
+            }
+
+            return;
+        }
+
+        Player = this;
+
+        #endregion Singleton boilerplate
+    }
 
     void Start()
     {
@@ -66,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         jumpAction.started += HandleJumping;
-     
+
         cameraTransform = cinemachineCamera.transform;
     }
 
@@ -120,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(Time.deltaTime * velocity);
         transform.rotation = cameraTransform.rotation;
     }
-  
+
     private void HandleJumping(InputAction.CallbackContext _)
     {
         OnJump?.Invoke();
