@@ -40,15 +40,18 @@ Shader "Custom/Sky"
         _PerlinVolume ("Perlin Volume", 3D) = "" {}
         _WorleyVolumeFBM ("Worley FBM Volume", 3D) = "" {}
         _WorleyVolumeEroder ("Worley Eroder Volume", 3D) = "" {}
+
+        // LIGHT
+        _PlayerPosition ("Sun Color", Color) = (1, 1, 1, 1)
+        _SunDirection ("Sun Direction", Vector) = (.4, -.7, .5)
+
     }
 
     SubShader
     {
-        Tags { "Queue"="Background" "RenderType"="Opaque" }
-        // TODO ?????
+        Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
         Cull Off
         ZWrite Off
-        ZTest Always
 
         Pass
         {
@@ -58,7 +61,6 @@ Shader "Custom/Sky"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            #include "Lighting.cginc"
 
             struct appdata
             {
@@ -98,8 +100,6 @@ Shader "Custom/Sky"
 
             float _Creepiness;
 
-            // TODO chatgpt has hallucinated some shit
-            // might need to switch other syntax for correct pipeline
             TEXTURE3D(_PerlinVolume);
             SAMPLER(sampler_PerlinVolume);
             TEXTURE3D(_WorleyVolumeFBM);
@@ -116,14 +116,9 @@ Shader "Custom/Sky"
             v2f vert (appdata v)
             {
                 v2f o;
-                o.pos = TransformObjectToHClip(v.vertex);
                 o.uv = v.uv;
-
-                // Reconstruct view direction for sky
-                float4 ndc = float4(v.uv * 2.0 - 1.0, 1.0, 1.0);
-                float4 view = mul(unity_CameraInvProjection, ndc);
-                view.xyz /= view.w;
-                o.viewDir = mul((float3x3)unity_CameraToWorld, normalize(view.xyz));
+                o.viewDir = v.vertex.xyz;
+                o.pos = TransformObjectToHClip(v.vertex);
 
                 return o;
             }
@@ -255,8 +250,10 @@ Shader "Custom/Sky"
                 float distant_light_step = cloud_layer_height * .3;
                 int light_steps = int(_LightMarchSteps);
 
+                Light sun = GetMainLight();
+
                 // Phase stuff
-                float3 ld = normalize(ray_origin - _WorldSpaceLightPos0.xyz);
+                float3 ld = normalize(ray_origin - sun.direction);
                 float dotlight = dot(ray_dir, ld);
                 float ray_phase = phase(dotlight, .4, .1);
 
@@ -303,7 +300,7 @@ Shader "Custom/Sky"
 
                     // TODO had to boost light with configurable factor since it didn't do much
                     float luminosity = light_scatter(light_density, dotlight);
-                    float3 light_contribution = _LightColor0 * luminosity * ray_phase * color.a * _LightBoost;
+                    float3 light_contribution = sun.color * luminosity * ray_phase * color.a * _LightBoost;
 
                     color.rgb += (_CloudColor + light_contribution) * transmittance * _DensityFactor * density;
                     color.a += transmittance * (1. - color.a);
@@ -318,7 +315,7 @@ Shader "Custom/Sky"
             {
                 float sharpsun = smoothstep(.9997, 1., dotsun);
                 float blurrysun = smoothstep(.99, 1., dotsun);
-                float3 sun = _LightColor0;
+                float3 sun = GetMainLight().color;
                 return (
                     sun * 100. * sharpsun +
                     sun * .5 * blurrysun*blurrysun*blurrysun
@@ -334,8 +331,9 @@ Shader "Custom/Sky"
 
             float3 render_sky(float3 pos, float3 eyedir)
             {
+                Light sun = GetMainLight();
                 // TODO correct dir???
-                float3 sun_direction = normalize(pos - _WorldSpaceLightPos0.xyz);
+                float3 sun_direction = normalize(pos - sun.direction);
                 float dotsun = dot(sun_direction, eyedir);
                 if (eyedir.y < 0.01)
                     return render_background(eyedir) + render_sun(dotsun) + render_creepy_stuff(dotsun);
@@ -377,8 +375,10 @@ Shader "Custom/Sky"
             float4 frag (v2f i) : SV_Target
             {
                 float3 dir = normalize(i.viewDir);
-                float3 pos = i.pos.xyz;
-                return float4(dir, 1);
+                // TODO må sende inn spillerposisjonen
+                float3 pos = float3(0, 0, 0);
+                // return float4(i.uv, 0, 1);
+                // return float4(i.viewDir, 1);
 
                 // TODO half res stuff???
                 // if (AT_CUBEMAP_PASS)

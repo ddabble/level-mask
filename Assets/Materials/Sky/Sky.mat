@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Sky
-  m_Shader: {fileID: 103, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: 6cb378f4273bb0929b2d647dfc9e1e43, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -64,12 +64,24 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _PerlinVolume:
+        m_Texture: {fileID: 11700000, guid: efd48ce14b8950988b9f642e7c37df02, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Tex:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WorleyVolumeEroder:
+        m_Texture: {fileID: 11700000, guid: efd48ce14b8950988b9f642e7c37df02, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WorleyVolumeFBM:
+        m_Texture: {fileID: 11700000, guid: efd48ce14b8950988b9f642e7c37df02, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -89,23 +101,35 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
+    - _BeersInputFactor: 0.1
+    - _BeersOutputFactor: 0.3
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
+    - _CloudsEnabled: 1
+    - _CloudsEndHeight: 240
+    - _CloudsStartHeight: 200
+    - _Creepiness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _DensityFactor: 1
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
+    - _ErosionFactor: 0.4
     - _Exposure: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _LightBoost: 40
+    - _LightMarchSteps: 5
+    - _MaxMarchSteps: 10
     - _Metallic: 0
+    - _MinMarchSteps: 2
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
@@ -122,10 +146,19 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BottomColor: {r: 0.11499997, g: 0.12299997, b: 0.41599998, a: 1}
+    - _CloudColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _GroundHorizonColor: {r: 0.8584906, g: 0.40899786, b: 0.69367653, a: 1}
+    - _HorizonColor: {r: 0.3250267, g: 0.5294958, b: 0.8301887, a: 1}
+    - _PlayerPosition: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SunColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SunDirection: {r: 0.4, g: -0.7, b: 0.5, a: 1}
     - _Tint: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _TopColor: {r: 0.9339623, g: 0.048460312, b: 0.54567057, a: 1}
+    - _WindSpeed: {r: -0.4, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &6446416322050134732
