@@ -1,5 +1,6 @@
 using System;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,9 +26,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float maxSpeed = 6.0f;
     [SerializeField]
-    private float acceleration = 10.0f;
+    private float acceleration = 20.0f;
     [SerializeField]
-    private float deceleration = 7.0f;
+    private float deceleration = 50.0f;
 
     private float speed = 0.0f;
     private Vector3 moveDirAlongFloor;
@@ -39,11 +40,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Tooltip("Time until peak")]
     [SerializeField]
-    private float jumpTime = 0.5f;
-
-    [Tooltip("Time from peak to ground on flat terrain")]
-    [SerializeField]
-    private float fallTime = 0.4f;
+    private float jumpTime = 0.2f;
 
     [Tooltip("Grace period after leaving ground where jumping is still possible")]
     [SerializeField]
@@ -52,8 +49,7 @@ public class PlayerMovement : MonoBehaviour
     public float verticalSpeed = 0.0f;
 
     private float jumpSpeed;
-    private float jumpGravity;
-    private float fallGravity;
+    private const float gravity = 22.0f;
     private float timeSinceLastOnFloor;
     public delegate void MoveEvent();
     public MoveEvent OnJump;
@@ -85,8 +81,7 @@ public class PlayerMovement : MonoBehaviour
 
         //From movement equations
         jumpSpeed = 2 * jumpHeight / jumpTime;
-        jumpGravity = 2 * jumpHeight / (jumpTime * jumpTime);
-        fallGravity = 2 * jumpHeight / (fallTime * fallTime);
+        
         timeSinceLastOnFloor = coyoteTime;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -94,11 +89,13 @@ public class PlayerMovement : MonoBehaviour
         jumpAction.started += HandleJumping;
 
         cameraTransform = cinemachineCamera.transform;
+
     }
 
     private void Update()
     {
         HandleMovement();
+        Debug.Log(speed);
     }
 
     void FixedUpdate()
@@ -109,7 +106,6 @@ public class PlayerMovement : MonoBehaviour
         if (!controller.isGrounded)
         {
             // Apply gravity
-            var gravity = verticalSpeed > 0.9f ? jumpGravity : fallGravity;
             verticalSpeed -= gravity * Time.deltaTime;
         }
         else if (verticalSpeed < 0.0f)
@@ -121,30 +117,36 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMovement()
     {
-        var inputDir = moveAction.ReadValue<Vector2>();
+        var inputDir = moveAction.ReadValue<Vector2>().normalized;
 
-        moveDirAlongFloor = GetMoveDirAlongFloor(inputDir);
-
-        var inputMagnitude = inputDir.magnitude;
+        var moveDir = GetMoveDirAlongFloor(inputDir);
+        var inputMagnitude = moveDir.magnitude;
 
         // Accelerate or decelerate
         var isMoving = inputMagnitude > 0.0f;
 
         if (isMoving)
         {
+            moveDirAlongFloor = moveDir;
+
             // Limit the max speed using the input magnitude, so that if you're tilting
             // the joystick just a little bit, you won't move as fast at the maximum
             // (the speed up until this clamped max speed should be unaffected, though)
-            speed = Math.Min(speed + Time.deltaTime * acceleration, inputMagnitude * maxSpeed);
+            var newSpeed = Math.Min(speed + Time.deltaTime * acceleration, inputMagnitude * maxSpeed);
+            speed = newSpeed;
         }
         else
         {
-            speed = Math.Max(speed + Time.deltaTime * deceleration, 0);
+            var newSpeed = Math.Max(speed - Time.deltaTime * deceleration, 0.0f);
+            speed = newSpeed;
+            Debug.Log("dec " + (speed - Time.deltaTime * deceleration));
+          
         }
 
         var velocity = Vector3.up * verticalSpeed + moveDirAlongFloor * speed;
         controller.Move(Time.deltaTime * velocity);
-        transform.rotation = cameraTransform.rotation;
+        head.transform.rotation = cameraTransform.rotation;
+
     }
 
     private void HandleJumping(InputAction.CallbackContext _)

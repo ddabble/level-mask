@@ -299,7 +299,7 @@ Transform:
   m_GameObject: {fileID: 2980353975860741786}
   serializedVersion: 2
   m_LocalRotation: {x: -0.37711358, y: 0.22710067, z: 0.09593107, w: 0.892753}
-  m_LocalPosition: {x: 0, y: 1.8, z: 0}
+  m_LocalPosition: {x: 7.073644, y: 1.9000002, z: -5.0280747}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -685,11 +685,10 @@ MonoBehaviour:
   cinemachineCamera: {fileID: 348692723790800496}
   head: {fileID: 2395354014234339530}
   maxSpeed: 6
-  acceleration: 10
-  deceleration: 7
+  acceleration: 20
+  deceleration: 50
   jumpHeight: 2
   jumpTime: 0.5
-  fallTime: 0.4
   coyoteTime: 0.2
   verticalSpeed: 0
 --- !u!114 &4006579248033653505
@@ -705,3 +704,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskHolder
   hudText: {fileID: 3973294405082857238}
+  pickUpMaskMaxDistance: 3
+  dropMaskDistance: 1.5
