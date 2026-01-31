@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
     public float verticalSpeed = 0.0f;
 
     private float jumpSpeed;
-    private const float gravity = 20.0f;
+    private const float gravity = 22.0f;
     private float timeSinceLastOnFloor;
     public delegate void MoveEvent();
     public MoveEvent OnJump;
